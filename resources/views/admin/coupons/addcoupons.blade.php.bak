@@ -1,0 +1,27 @@
+
+<div class="row p-3" style="max-height:500px; overflow:auto;border-top: 1px solid #dee2e6;">
+    <div class="col-md-12">
+    
+        @foreach($coupons as $coupon)
+            <div class="media mb-3">
+                <div class="n-chk">
+                    <label class="new-control new-checkbox checkbox-success" style="height: 18px;">
+                      <input type="checkbox" class="new-control-input" data-id="{{ $coupon->id }}"
+                        @if($coupon->users->contains($user))
+                            checked
+                        @endif
+                      >
+                      <span class="new-control-indicator"></span>
+                    </label>
+                </div>
+            
+                <div class="media-body">
+                    <h6 class="media-heading"><span class="media-title">{{ $coupon->name }} </span></h6>
+                    <p class="media-text">{{ $coupon->discount }}% | {{ $coupon->expired }}</p>
+                </div>
+            </div>
+        @endforeach
+    </div>
+    
+    
+</div>

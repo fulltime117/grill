@@ -1,0 +1,226 @@
+@extends ('layouts.admin')
+
+
+@section('page-title')
+    <title>Admin - Coupon List</title>
+@endsection
+
+
+@section('page-styles')
+    <link rel="stylesheet" type="text/css" href="{{asset('plugins/table/datatable/datatables.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('plugins/table/datatable/custom_dt_html5.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('plugins/table/datatable/dt-global_style.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/apps/todolist.css')}}">
+    <link href="{{asset('plugins/flatpickr/flatpickr.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('plugins/flatpickr/custom-flatpickr.css')}}" rel="stylesheet" type="text/css" />
+    <style>
+        /* .flatpickr-calendar.open {
+            display: inline-block;
+            z-index: 1052;
+        } */
+        .new-control.new-checkbox > input:checked ~ span.new-control-indicator {
+            background: #ffffff!important;
+            border: 2px solid #e7515a!important;
+        }
+        .modal-content svg.close {
+            color: #e7515a!important;
+        }
+        /* new-control.new-checkbox span.new-control-indicator:after {
+            border: solid #8dbf42!important;
+        } */
+    </style>
+    
+@endsection
+
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('cu.coupons') }}">Coupon</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><a href="javascript:void(0);">Coupon List</a></li>
+    
+@endsection
+
+@section('content')
+
+    <div class="row layout-top-spacing">
+                
+        <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
+            <div class="widget-content widget-content-area br-6">
+                <div class="d-flex justify-content-between px-4 align-items-center border-bottom">
+                    <h4 class="">User List</h4>
+                </div>
+                <div class="table-responsive mb-4 mt-4">
+                
+                    <table id="courselist" class="table table-hover non-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Account</th>
+                                <th>Name</th>
+                                <th>Coupon</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            @if(isset($users))
+                                @foreach ($users as $user)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.users.show',$user) }}">
+                                                <div class="d-flex">
+                                                    <div class="usr-img-frame mr-2 rounded-circle">
+                                                        <img alt="avatar" class="img-fluid rounded-circle" src="{{asset($user->profile->getImage())}}">
+                                                    </div>
+                                                    <p class="align-self-center mb-0 admin-name"> {{ $user->email }}</p> </p>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>{{ $user->firstname }} {{ $user->lastname }}</td>
+                                        <td>
+                                            @forelse($user->coupons as $coupon)
+                                                <a href="{{ route('cu.coupons') }}" class="bs-tooltip" title="{{ $coupon->expired }}">
+                                                    <p class="badge badge-success">{{ $coupon->discount }}%</p> 
+                                                </a>
+                                            @empty
+                                                
+                                            @endforelse
+                                        </td>
+                                        <td>
+                                            <a href=" {{ route('cu.users.ajax_addcoupons', $user) }}"
+                                                class="open-coupon text-danger bs-tooltip"
+                                                title="Add coupons to {{ $user->firstname }}"
+                                                data-url="{{ route('cu.users.addcoupons', $user) }}" 
+                                                data-user_id = "{{ $user->id }}"
+                                                data-toggle="modal" data-target="#addCouponModal">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    
+                                @endforeach
+                            @endif
+                        </tbody>
+                        
+                    </table>
+                
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalTitle"aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x close" data-dismiss="modal"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <div class="compose-box">
+                        <div class="compose-content" id="addCouponModalTitle">
+                            <h5 class="">Add Coupan</h5>
+                            <form id="add-coupon-form" action="" method="post">
+                                
+    
+                                
+    
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-danger" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cancel</button>
+                    <button id="add-coupon" class="btn btn-danger ">Add Coupon</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+@endsection
+
+@section('page-scripts')
+    <script src="{{asset('plugins/table/datatable/datatables.js')}}"></script>
+    <!-- NOTE TO Use Copy CSV Excel PDF Print Options You Must Include These Files  -->
+    <script src="{{asset('plugins/table/datatable/button-ext/dataTables.buttons.min.js')}}"></script>
+    <script src="{{asset('plugins/table/datatable/button-ext/jszip.min.js')}}"></script>    
+    <script src="{{asset('plugins/table/datatable/button-ext/buttons.html5.min.js')}}"></script>
+    <script src="{{asset('plugins/table/datatable/button-ext/buttons.print.min.js')}}"></script>
+    <script src="{{asset('plugins/sweetalerts/custom-sweetalert.js')}}"></script>
+    <script src="{{asset('plugins/fullcalendar/flatpickr.js')}}"></script>
+@endsection
+
+
+@section('scripts')
+<script>
+    // var f1 = flatpickr(document.getElementById('expired'));
+    // var f2 = flatpickr(document.getElementById('expired2'));
+    $('#courselist').DataTable( {
+        dom: '<"row"<"col-md-12"<"row"<"col-md-6"B><"col-md-6"f> > ><"col-md-12"rt> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >',
+        buttons: {
+            buttons: [
+                { extend: 'copy', className: 'btn' },
+                { extend: 'csv', className: 'btn' },
+                { extend: 'excel', className: 'btn' },
+                { extend: 'print', className: 'btn' }
+            ]
+        },
+        "oLanguage": {
+            "oPaginate": { "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>', "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>' },
+            "sInfo": "Showing page _PAGE_ of _PAGES_",
+            "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
+            "sSearchPlaceholder": "Search...",
+           "sLengthMenu": "Results :  _MENU_",
+        },
+        "stripeClasses": [],
+        "lengthMenu": [7, 10, 20, 50],
+        "pageLength": 7 
+    } );
+    
+    
+    $('.open-coupon').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url: $(this).attr('href'),
+            method: 'POST',
+            success: function(res){
+                if(res){
+                    $('#add-coupon-form').html(res);
+                }
+            }
+        })
+        
+        $('#add-coupon').attr('data-url', $(this).attr('data-url')) ;
+    });
+    
+    
+    $('#add-coupon').click(function(e) {
+        e.preventDefault();
+        let coupons = [];
+        
+        $('.new-control-input').each(function() {
+            if($(this).prop('checked')) {
+                coupons.push($(this).attr('data-id'));   
+            }
+        })
+        
+        $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url: $(this).attr('data-url'),
+            method: 'POST',
+            dataType: 'json',
+            data: {coupons},
+            success: function(res){
+                if(res){
+                    location.reload();
+                }
+            }
+        })
+    });
+    
+    
+    
+    
+
+</script>
+@endsection
